@@ -6,8 +6,8 @@
 ******/
 SELECT [StockItemID]
       ,[StockItemName]
-  FROM [WideWorldImporters].[Warehouse].[StockItems]
-  where StockItemName like '%urgent%' or StockItemName like 'Animal%' 
+FROM [WideWorldImporters].[Warehouse].[StockItems]
+where StockItemName like '%urgent%' or StockItemName like 'Animal%' 
 
 /****** 
 2. Поставщиков (Suppliers), у которых не было сделано ни одного заказа (PurchaseOrders). Сделать через JOIN, с подзапросом задание принято не будет.
@@ -19,9 +19,9 @@ SELECT s.[SupplierID]
 	  ,po.OrderDate
 
   FROM [WideWorldImporters].[Purchasing].[Suppliers] as s
-  Left JOIN [WideWorldImporters].[Purchasing].[PurchaseOrders] as po
-  ON s.SupplierCategoryID = po.SupplierID
-  where po.PurchaseOrderID is Null
+Left JOIN [WideWorldImporters].[Purchasing].[PurchaseOrders] as po
+	   ON s.SupplierCategoryID = po.SupplierID
+where po.PurchaseOrderID is Null
 
   /****** 
 3. Заказы (Orders) с ценой товара более 100$ либо количеством единиц товара более 20 штук и присутствующей датой комплектации всего заказа (PickingCompletedWhen).
@@ -45,13 +45,13 @@ SELECT o.[OrderID]
 		from [WideWorldImporters].[Sales].[Customers] as c
 		where o.CustomerID = c.CustomerID
 	  )
-  FROM [WideWorldImporters].[Sales].[Orders] as o
-  JOIN [WideWorldImporters].[Sales].OrderLines as ol
+FROM [WideWorldImporters].[Sales].[Orders] as o
+JOIN [WideWorldImporters].[Sales].OrderLines as ol
   ON o.OrderID = ol.OrderID
-  where (ol.UnitPrice > 100 or ol.Quantity > 20) and ol.PickingCompletedWhen is not null
-  order by [Quarter], [Third], [Date] 
-  Offset 1000 Row
-  fetch next 100 rows only
+where (ol.UnitPrice > 100 or ol.Quantity > 20) and ol.PickingCompletedWhen is not null
+order by [Quarter], [Third], [Date] 
+Offset 1000 Row
+fetch next 100 rows only
 
 /*******
 4. Заказы поставщикам (Purchasing.Suppliers), которые были исполнены в январе 2014 года 
@@ -64,28 +64,27 @@ SELECT o.[OrderID]
 
 Таблицы: Purchasing.Suppliers, Purchasing.PurchaseOrders, Application.DeliveryMethods, Application.People.
 ******/
-SELECT	[DeliveryMethodName] = dm.DeliveryMethodName
-		,[OrderDate] = po.OrderDate
-		,[SupplierName] = s.SupplierName
-		,[ContactPerson] = p.FullName
+SELECT	dm.DeliveryMethodName as DeliveryMethodName
+		,po.OrderDate as OrderDate
+		,s.SupplierName as SupplierName
+		,p.FullName as ContactPerson
 		,po.ExpectedDeliveryDate
-		
-  FROM [WideWorldImporters].[Purchasing].[Suppliers] as s
-  JOIN [WideWorldImporters].Application.DeliveryMethods as dm
+FROM [WideWorldImporters].[Purchasing].[Suppliers] as s
+JOIN [WideWorldImporters].Application.DeliveryMethods as dm
   ON s.DeliveryMethodID = dm.DeliveryMethodID
-  JOIN [WideWorldImporters].Purchasing.PurchaseOrders as po
+JOIN [WideWorldImporters].Purchasing.PurchaseOrders as po
   ON s.SupplierID = po.SupplierID
-  JOIN [WideWorldImporters].Application.People as p
+JOIN [WideWorldImporters].Application.People as p
   ON po.ContactPersonID = p.PersonID
-  where (dm.DeliveryMethodName in ('Air Freight' , 'Refrigerated Air Freight'))
-		and po.ExpectedDeliveryDate between '20140101' and '20140131'
+where (dm.DeliveryMethodName in ('Air Freight' , 'Refrigerated Air Freight'))
+	 and po.ExpectedDeliveryDate between '20140101' and '20140131'
 
 /*******
 5. Десять последних продаж (по дате) с именем клиента и именем сотрудника, который оформил заказ (SalespersonPerson).
 *******/
 select TOP 10
 		o.OrderID
-		,[Customer] = p.FullName
+		,p.FullName as Customer
 		,[Sales Person] = (
 			select p.FullName
 			from WideWorldImporters.Application.People p
@@ -93,7 +92,7 @@ select TOP 10
 		)
 from [WideWorldImporters].Sales.Orders o
 JOIN WideWorldImporters.Application.People p
-on o.CustomerID = p.PersonID
+  on o.CustomerID = p.PersonID
 where p.FullName is not null
 order by OrderDate desc 
 
@@ -102,9 +101,9 @@ order by OrderDate desc
 Chocolate frogs 250g. Имя товара смотреть в Warehouse.StockItems.
 ******/
 select 
-		[ID] = o.CustomerID
-		,[Name] = p.FullName
-		,[Phone] = p.PhoneNumber
+		o.CustomerID as ID
+		,p.FullName as Name
+		,p.PhoneNumber as Phone
 from WideWorldImporters.Sales.OrderLines ol
 join WideWorldImporters.Sales.Orders o
 on o.OrderID = ol.OrderID
