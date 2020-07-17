@@ -7,7 +7,7 @@
 SELECT [StockItemID]
       ,[StockItemName]
 FROM [WideWorldImporters].[Warehouse].[StockItems]
-where StockItemName like '%urgent%' or StockItemName like 'Animal%' 
+WHERE StockItemName like '%urgent%' or StockItemName like 'Animal%' 
 
 /****** 
 2. Поставщиков (Suppliers), у которых не было сделано ни одного заказа (PurchaseOrders). Сделать через JOIN, с подзапросом задание принято не будет.
@@ -18,12 +18,12 @@ SELECT s.[SupplierID]
       ,po.PurchaseOrderID
 	  ,po.OrderDate
 
-  FROM [WideWorldImporters].[Purchasing].[Suppliers] as s
+FROM [WideWorldImporters].[Purchasing].[Suppliers] as s
 Left JOIN [WideWorldImporters].[Purchasing].[PurchaseOrders] as po
 	   ON s.SupplierCategoryID = po.SupplierID
-where po.PurchaseOrderID is Null
+WHERE po.PurchaseOrderID is Null
 
-  /****** 
+/****** 
 3. Заказы (Orders) с ценой товара более 100$ либо количеством единиц товара более 20 штук и присутствующей датой комплектации всего заказа (PickingCompletedWhen).
 Вывести:
 * OrderID
@@ -41,15 +41,15 @@ SELECT o.[OrderID]
 	  ,[Quarter] = datename(Q, o.OrderDate)
 	  ,[Third] = CEILING(CAST(MONTH(o.OrderDate) AS float)/4)
       , CustomerName = (
-		select c.CustomerName
-		from [WideWorldImporters].[Sales].[Customers] as c
-		where o.CustomerID = c.CustomerID
+			select c.CustomerName
+			from [WideWorldImporters].[Sales].[Customers] as c
+			where o.CustomerID = c.CustomerID
 	  )
 FROM [WideWorldImporters].[Sales].[Orders] as o
 JOIN [WideWorldImporters].[Sales].OrderLines as ol
   ON o.OrderID = ol.OrderID
-where (ol.UnitPrice > 100 or ol.Quantity > 20) and ol.PickingCompletedWhen is not null
-order by [Quarter], [Third], [Date] 
+WHERE (ol.UnitPrice > 100 or ol.Quantity > 20) and ol.PickingCompletedWhen is not null
+ORDER BY [Quarter], [Third], [Date] 
 Offset 1000 Row
 fetch next 100 rows only
 
@@ -76,40 +76,40 @@ JOIN [WideWorldImporters].Purchasing.PurchaseOrders as po
   ON s.SupplierID = po.SupplierID
 JOIN [WideWorldImporters].Application.People as p
   ON po.ContactPersonID = p.PersonID
-where (dm.DeliveryMethodName in ('Air Freight' , 'Refrigerated Air Freight'))
+WHERE (dm.DeliveryMethodName in ('Air Freight' , 'Refrigerated Air Freight'))
 	 and po.ExpectedDeliveryDate between '20140101' and '20140131'
 
 /*******
 5. Десять последних продаж (по дате) с именем клиента и именем сотрудника, который оформил заказ (SalespersonPerson).
 *******/
-select TOP 10
+SELECT TOP 10
 		o.OrderID
 		,p.FullName as Customer
 		,[Sales Person] = (
-			select p.FullName
-			from WideWorldImporters.Application.People p
-			where p.PersonID = o.SalespersonPersonID
+			SELECT p.FullName
+			FROM WideWorldImporters.Application.People p
+			WHERE p.PersonID = o.SalespersonPersonID
 		)
-from [WideWorldImporters].Sales.Orders o
+FROM [WideWorldImporters].Sales.Orders o
 JOIN WideWorldImporters.Application.People p
-  on o.CustomerID = p.PersonID
-where p.FullName is not null
-order by OrderDate desc 
+  ON o.CustomerID = p.PersonID
+WHERE p.FullName is not null
+ORDER BY OrderDate DESC 
 
 /******
 6. Все ид и имена клиентов и их контактные телефоны, которые покупали товар 
 Chocolate frogs 250g. Имя товара смотреть в Warehouse.StockItems.
 ******/
-select 
+SELECT 
 		o.CustomerID as ID
 		,p.FullName as Name
 		,p.PhoneNumber as Phone
-from WideWorldImporters.Sales.OrderLines ol
-join WideWorldImporters.Sales.Orders o
-on o.OrderID = ol.OrderID
-join WideWorldImporters.Warehouse.StockItems si
-on ol.StockItemID = si.StockItemID
-Join WideWorldImporters.Application.People p
-on o.CustomerID = p.PersonID
-where StockItemName = 'Chocolate frogs 250g'
-order by ID
+FROM WideWorldImporters.Sales.OrderLines ol
+JOIN WideWorldImporters.Sales.Orders o
+ON o.OrderID = ol.OrderID
+JOIN WideWorldImporters.Warehouse.StockItems si
+ON ol.StockItemID = si.StockItemID
+JOIN WideWorldImporters.Application.People p
+ON o.CustomerID = p.PersonID
+WHERE StockItemName = 'Chocolate frogs 250g'
+ORDER BY ID
