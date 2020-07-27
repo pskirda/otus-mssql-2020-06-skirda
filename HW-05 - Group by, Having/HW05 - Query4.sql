@@ -1,4 +1,4 @@
-drop table if exists [WideWorldImporters].dbo.MyEmployees
+drop table if exists dbo.MyEmployees
 
 CREATE TABLE dbo.MyEmployees
 (
@@ -22,6 +22,8 @@ INSERT INTO dbo.MyEmployees VALUES
 ,(16, N'David',N'Bradley', N'Marketing Manager', 4, 273)
 ,(23, N'Mary', N'Gibson', N'Marketing Specialist', 4, 16);
 
+declare @table_var TABLE (ID int not null, [Name] nvarchar(100), [Title] nvarchar(50), [EmpLevel] int)
+
 ;WITH Recurce_manager_CTE (EmployeeID, [Name], Title, EmployeeLevel, ManagerId)
 AS 
 (
@@ -44,10 +46,20 @@ AS
 	JOIN Recurce_manager_CTE rm_CTE
 	  on rm_CTE.EmployeeID = me.ManagerID
 )
-
+insert into @table_var 
 select
 	rm.EmployeeID
 	,rm.Name
 	,rm.Title
 	,rm.EmployeeLevel
 from Recurce_manager_CTE rm
+
+select * from @table_var
+
+drop table if exists #temp_table
+
+Create TABLE #temp_table (ID int not null, [Name] nvarchar(100), [Title] nvarchar(50), [EmpLevel] int)
+
+insert into #temp_table select * from @table_var
+
+select * from #temp_table

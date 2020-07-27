@@ -16,7 +16,8 @@ select
 	YEAR(i.InvoiceDate) as [Year]
 	,Month(i.InvoiceDate) as [Month]
 	,format(AVG(il.UnitPrice), '0.00') as [AVG_price]
-	,format(SUM(il.UnitPrice), '# ##0.00') as [SUM]
+	,format(SUM(il.UnitPrice * il.Quantity), '# ### ##0.00') as [SUM]
+	,format(SUM(il.Quantity), '# ### ##0.00') as [SUM_Quantity]
 from Sales.Invoices i
 join Sales.InvoiceLines il
   on i.InvoiceID = il.InvoiceID
@@ -35,17 +36,17 @@ Order by [Year], [Month]
 Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
 
 ***/
+use [WideWorldImporters]
 
 select 
 	YEAR(i.InvoiceDate) as [Year]
 	,Month(i.InvoiceDate) as [Month]
-	,format(AVG(il.UnitPrice), '0.00') as [AVG_price]
-	,format(SUM(il.UnitPrice), '# ##0.00') as [SUM]
+	,format(SUM(il.Quantity * il.UnitPrice), '# ### ##0.00') as [SUM]
 from Sales.Invoices i
 join Sales.InvoiceLines il
   on i.InvoiceID = il.InvoiceID
 Group by YEAR(i.InvoiceDate), MONTH(i.InvoiceDate)
-Having SUM(il.UnitPrice) > 250000
+Having SUM(il.Quantity) > 200000
 Order by [Year], [Month]
 
 /***
@@ -65,12 +66,14 @@ Order by [Year], [Month]
 
 ***/
 
+use [WideWorldImporters]
+
 select
 	YEAR(i.InvoiceDate) as [Year]
 	,Month(i.InvoiceDate) as [Month]
 	,si.StockItemName as [StockItemName]
 	,MIN(i.InvoiceDate) as [FirstSale]
-	,format(SUM(il.UnitPrice), '# ##0.00') as [MonthSUM]
+	,format(SUM(il.UnitPrice * il.Quantity), '# ##0.00') as [MonthSUM]
 	,Sum(il.Quantity) as [ItemQuantity]
 from Sales.Invoices i
 join Sales.InvoiceLines il
@@ -78,12 +81,14 @@ join Sales.InvoiceLines il
 join Warehouse.StockItems si
   on si.StockItemID = il.StockItemID
 Group by YEAR(i.InvoiceDate), MONTH(i.InvoiceDate), [StockItemName]
-Having SUM(il.Quantity) > 4000
+Having SUM(il.Quantity) < 50
 Order by [Year], [Month], StockItemName
 
 /****
 4. Написать рекурсивный CTE sql запрос и заполнить им временную таблицу и табличную переменную
 ****/
+use [WideWorldImporters]
+
 drop table if exists [WideWorldImporters].dbo.MyEmployees
 
 CREATE TABLE dbo.MyEmployees
@@ -108,6 +113,8 @@ INSERT INTO dbo.MyEmployees VALUES
 ,(16, N'David',N'Bradley', N'Marketing Manager', 4, 273)
 ,(23, N'Mary', N'Gibson', N'Marketing Specialist', 4, 16);
 
+declare @table_var TABLE (ID int not null, [Name] nvarchar(100), [Title] nvarchar(50), [EmpLevel] int)
+
 ;WITH Recurce_manager_CTE (EmployeeID, [Name], Title, EmployeeLevel, ManagerId)
 AS 
 (
@@ -130,10 +137,20 @@ AS
 	JOIN Recurce_manager_CTE rm_CTE
 	  on rm_CTE.EmployeeID = me.ManagerID
 )
-
+insert into @table_var 
 select
 	rm.EmployeeID
 	,rm.Name
 	,rm.Title
 	,rm.EmployeeLevel
 from Recurce_manager_CTE rm
+
+select * from @table_var
+
+drop table if exists #temp_table
+
+Create TABLE #temp_table (ID int not null, [Name] nvarchar(100), [Title] nvarchar(50), [EmpLevel] int)
+
+insert into #temp_table select * from @table_var
+
+select * from #temp_table
