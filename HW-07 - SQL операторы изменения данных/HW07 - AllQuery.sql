@@ -1,5 +1,5 @@
-/***
-1. Довставлять в базу 5 записей используя insert в таблицу Customers или Suppliers
+п»ї/***
+1. Р”РѕРІСЃС‚Р°РІР»СЏС‚СЊ РІ Р±Р°Р·Сѓ 5 Р·Р°РїРёСЃРµР№ РёСЃРїРѕР»СЊР·СѓСЏ insert РІ С‚Р°Р±Р»РёС†Сѓ Customers РёР»Рё Suppliers
 ***/
 
 USE WideWorldImporters
@@ -57,7 +57,7 @@ values (
 		,'Level test'
 		,'450000 Ufa, Lenina St 1'
 		,'450000'
-		,NULL  --координаты какие то
+		,NULL  --РєРѕРѕСЂРґРёРЅР°С‚С‹ РєР°РєРёРµ С‚Рѕ
 		,'PO Box 7777'
 		,'Ufa'
 		,'450000'
@@ -86,7 +86,7 @@ values (
 		,'Level test'
 		,'450000 Ufa, Lenina St 1'
 		,'450000'
-		,NULL  --координаты какие то
+		,NULL  --РєРѕРѕСЂРґРёРЅР°С‚С‹ РєР°РєРёРµ С‚Рѕ
 		,'PO Box 7777'
 		,'Ufa'
 		,'450000'
@@ -115,7 +115,7 @@ values (
 		,'Level test'
 		,'450000 Ufa, Lenina St 1'
 		,'450000'
-		,NULL  --координаты какие то
+		,NULL  --РєРѕРѕСЂРґРёРЅР°С‚С‹ РєР°РєРёРµ С‚Рѕ
 		,'PO Box 7777'
 		,'Ufa'
 		,'450000'
@@ -144,7 +144,7 @@ values (
 		,'Level test'
 		,'450000 Ufa, Lenina St 1'
 		,'450000'
-		,NULL  --координаты какие то
+		,NULL  --РєРѕРѕСЂРґРёРЅР°С‚С‹ РєР°РєРёРµ С‚Рѕ
 		,'PO Box 7777'
 		,'Ufa'
 		,'450000'
@@ -173,7 +173,7 @@ values (
 		,'Level test'
 		,'450000 Ufa, Lenina St 1'
 		,'450000'
-		,NULL  --координаты какие то
+		,NULL  --РєРѕРѕСЂРґРёРЅР°С‚С‹ РєР°РєРёРµ С‚Рѕ
 		,'PO Box 7777'
 		,'Ufa'
 		,'450000'
@@ -183,7 +183,7 @@ values (
 GO
 Select * from Purchasing.Suppliers
 
---Перенесем зафиксируем добавленные столбцы, что бы использовать в мерже
+--РџРµСЂРµРЅРµСЃРµРј Р·Р°С„РёРєСЃРёСЂСѓРµРј РґРѕР±Р°РІР»РµРЅРЅС‹Рµ СЃС‚РѕР»Р±С†С‹, С‡С‚Рѕ Р±С‹ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РІ РјРµСЂР¶Рµ
 drop table if exists #tempSuppliers
 
 select * into #tempSuppliers
@@ -194,41 +194,41 @@ select * from #tempSuppliers
 
 
 /***
-2. удалите 1 запись из Customers, которая была вами добавлена
+2. СѓРґР°Р»РёС‚Рµ 1 Р·Р°РїРёСЃСЊ РёР· Customers, РєРѕС‚РѕСЂР°СЏ Р±С‹Р»Р° РІР°РјРё РґРѕР±Р°РІР»РµРЅР°
 ***/
 
---было добавленных значений
-select count(*) as [Добавленных значений] from Purchasing.Suppliers
+--Р±С‹Р»Рѕ РґРѕР±Р°РІР»РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
+select count(*) as [Р”РѕР±Р°РІР»РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№] from Purchasing.Suppliers
 where SupplierName like '%Additional%'
 
---удаляем одно из добавленных значений
+--СѓРґР°Р»СЏРµРј РѕРґРЅРѕ РёР· РґРѕР±Р°РІР»РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 delete 
 from Purchasing.Suppliers
 where SupplierID in (Select top 2 SupplierID from Purchasing.Suppliers where SupplierName like '%Additional%')
---стало добавленных значений
-select count(*) as [Добавленных значений] from Purchasing.Suppliers
+--СЃС‚Р°Р»Рѕ РґРѕР±Р°РІР»РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
+select count(*) as [Р”РѕР±Р°РІР»РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№] from Purchasing.Suppliers
 where SupplierName like '%Additional%'
---или так
+--РёР»Рё С‚Р°Рє
 Select * from Purchasing.Suppliers where SupplierName like '%Additional%'
 
 /***
-3. изменить одну запись, из добавленных через UPDATE
+3. РёР·РјРµРЅРёС‚СЊ РѕРґРЅСѓ Р·Р°РїРёСЃСЊ, РёР· РґРѕР±Р°РІР»РµРЅРЅС‹С… С‡РµСЂРµР· UPDATE
 ***/
 
 UPDATE Purchasing.Suppliers
 SET
 	SupplierName = 'Add ' + SupplierName
-OUTPUT --можно выводить изменненые значения
+OUTPUT --РјРѕР¶РЅРѕ РІС‹РІРѕРґРёС‚СЊ РёР·РјРµРЅРЅРµРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
 	inserted.SupplierID
 	,inserted.SupplierName as [NewName]
 	,deleted.SupplierName as [OldName]
 where SupplierID in (Select top 2 SupplierID from Purchasing.Suppliers where SupplierName like '%Additional%')
 
---а можно и потом глянуть изменения
+--Р° РјРѕР¶РЅРѕ Рё РїРѕС‚РѕРј РіР»СЏРЅСѓС‚СЊ РёР·РјРµРЅРµРЅРёСЏ
 Select * from Purchasing.Suppliers where SupplierName like '%Additional%'
 
 /***
-4. Написать MERGE, который вставит вставит запись в клиенты, если ее там нет, и изменит если она уже есть
+4. РќР°РїРёСЃР°С‚СЊ MERGE, РєРѕС‚РѕСЂС‹Р№ РІСЃС‚Р°РІРёС‚ РІСЃС‚Р°РІРёС‚ Р·Р°РїРёСЃСЊ РІ РєР»РёРµРЅС‚С‹, РµСЃР»Рё РµРµ С‚Р°Рј РЅРµС‚, Рё РёР·РјРµРЅРёС‚ РµСЃР»Рё РѕРЅР° СѓР¶Рµ РµСЃС‚СЊ
 ***/
 
 MERGE Purchasing.Suppliers as Target
@@ -298,9 +298,9 @@ OUTPUT $action, deleted.*, inserted.*;
 select * from Purchasing.Suppliers
 
 /***
-5. Напишите запрос, который выгрузит данные через bcp out и загрузить через bulk insert
+5. РќР°РїРёС€РёС‚Рµ Р·Р°РїСЂРѕСЃ, РєРѕС‚РѕСЂС‹Р№ РІС‹РіСЂСѓР·РёС‚ РґР°РЅРЅС‹Рµ С‡РµСЂРµР· bcp out Рё Р·Р°РіСЂСѓР·РёС‚СЊ С‡РµСЂРµР· bulk insert
 ***/
---Устанавливаем и настраиваем bcp и bulk
+--РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Рё РЅР°СЃС‚СЂР°РёРІР°РµРј bcp Рё bulk
 -- To allow advanced options to be changed.  
 EXEC sp_configure 'show advanced options', 1;  
 GO  
@@ -314,15 +314,15 @@ GO
 RECONFIGURE;  
 GO  
 
-SELECT @@SERVERNAME--параметры моего сервера
+SELECT @@SERVERNAME--РїР°СЂР°РјРµС‚СЂС‹ РјРѕРµРіРѕ СЃРµСЂРІРµСЂР°
 
---выгружаем копию таблицы в текстовый файл
+--РІС‹РіСЂСѓР¶Р°РµРј РєРѕРїРёСЋ С‚Р°Р±Р»РёС†С‹ РІ С‚РµРєСЃС‚РѕРІС‹Р№ С„Р°Р№Р»
 exec master..xp_cmdshell '
 bcp "[WideWorldImporters].Purchasing.Suppliers" 
-out  "C:\Курсы\SQL\otus-mssql-2020-06-skirda\HW-07 - SQL операторы изменения данных\Suppliers.txt" 
+out  "C:\РљСѓСЂСЃС‹\SQL\otus-mssql-2020-06-skirda\HW-07 - SQL РѕРїРµСЂР°С‚РѕСЂС‹ РёР·РјРµРЅРµРЅРёСЏ РґР°РЅРЅС‹С…\Suppliers.txt" 
 -T -w -t"@eu&$1&" -S UFA-SKIRDAPA\SQL2017'
 
---создаем пустую таблицу нужной нам структуры
+--СЃРѕР·РґР°РµРј РїСѓСЃС‚СѓСЋ С‚Р°Р±Р»РёС†Сѓ РЅСѓР¶РЅРѕР№ РЅР°Рј СЃС‚СЂСѓРєС‚СѓСЂС‹
 
 drop table if exists Purchasing.SuppliersBAK
 
@@ -333,7 +333,7 @@ delete from Purchasing.SuppliersBAK
 where SupplierID is not NULL
 
 BULK INSERT [WideWorldImporters].Purchasing.SuppliersBAK	
-				   FROM "C:\Курсы\SQL\otus-mssql-2020-06-skirda\HW-07 - SQL операторы изменения данных\Suppliers.txt"
+				   FROM "C:\РљСѓСЂСЃС‹\SQL\otus-mssql-2020-06-skirda\HW-07 - SQL РѕРїРµСЂР°С‚РѕСЂС‹ РёР·РјРµРЅРµРЅРёСЏ РґР°РЅРЅС‹С…\Suppliers.txt"
 				   WITH 
 					 (
 						BATCHSIZE = 1000, 
